@@ -3,65 +3,60 @@
 #include <string>
 #include <fstream>
 #include <limits>
-
+#include <iomanip> // For setw
 using namespace std;
 
-// Employee class to store employee details
+// Employee details
 class Employee {
 public:
-    int id;        // Employee ID
-    string name;   // Employee name
-    string address; // Employee address
-    double salary; // Monthly salary
+    int id;
+    string name;
+    string email;
+    double salary;
 
-    // Function to get employee details with safe input
     void input() {
-        // ID input validation
         while (true) {
             cout << "Enter ID: ";
             if (cin >> id && id > 0) break;
-            cout << "Invalid input. Please enter a positive integer.\n";
+            cout << "Invalid input. Enter a positive integer.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear newline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         cout << "Enter name: ";
         getline(cin, name);
 
-        cout << "Enter address: ";
-        getline(cin, address);
+        cout << "Enter email: ";
+        getline(cin, email);
 
-        // Salary input validation
         while (true) {
             cout << "Enter monthly salary: ";
             if (cin >> salary && salary >= 0) break;
-            cout << "Invalid input. Please enter a positive number.\n";
+            cout << "Invalid input. Enter a positive number.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear newline
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
     }
 
-    // Function to show employee details
     void show() const {
-        cout << name << "\t" << id << "\t" << address << "\t" << salary << endl;
+        cout << left << setw(20) << name
+             << setw(10) << id
+             << setw(30) << email
+             << setw(10) << salary
+             << endl;
     }
 };
 
-// Payroll class to manage employees
+// Payroll management
 class Payroll {
 private:
-    vector<Employee> employees; // List of employees
+    vector<Employee> employees;
 
     void show_menu() {
         cout << "\n----- Payroll System by Aman -----\n";
-        cout << "1. Add Employee\n";
-        cout << "2. Remove Employee\n";
-        cout << "3. Change Employee Details\n";
-        cout << "4. Print Salary Report\n";
-        cout << "5. Exit\n";
-        cout << "Choose: ";
+        cout << "1. Add Employee\n2. Remove Employee\n3. Change Employee Details\n4. Print Salary Report\n5. Search Employee\n6. Exit\nChoose: ";
     }
 
     void add_employee() {
@@ -73,14 +68,15 @@ private:
 
     void remove_employee() {
         int id;
-        while (true) {
-            cout << "Enter ID: ";
-            if (cin >> id) break;
-            cout << "Invalid input. Please enter a number.\n";
+        cout << "Enter ID: ";
+        if (!(cin >> id)) {
+            cout << "Invalid input.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
         }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
         for (size_t i = 0; i < employees.size(); i++) {
             if (employees[i].id == id) {
                 employees.erase(employees.begin() + i);
@@ -93,14 +89,15 @@ private:
 
     void change_employee() {
         int id;
-        while (true) {
-            cout << "Enter ID: ";
-            if (cin >> id) break;
-            cout << "Invalid input. Please enter a number.\n";
+        cout << "Enter ID: ";
+        if (!(cin >> id)) {
+            cout << "Invalid input.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
         }
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
         for (Employee& emp : employees) {
             if (emp.id == id) {
                 cout << "Enter new details:\n";
@@ -117,44 +114,74 @@ private:
         ofstream file("salary_report.txt");
 
         cout << "\n----- Salary Report -----\n";
-        cout << "Name\tID\tAddress\tSalary\n";
-        cout << "------------------------\n";
+        cout << left << setw(20) << "Name"
+             << setw(10) << "ID"
+             << setw(30) << "Email"
+             << setw(10) << "Salary" << "\n";
+        cout << string(70, '-') << "\n";
 
         if (file.is_open()) {
-            file << "----- Salary Report -----\n";
-            file << "Name\tID\tAddress\tSalary\n";
-            file << "------------------------\n";
+            file << left << setw(20) << "Name"
+                 << setw(10) << "ID"
+                 << setw(30) << "Email"
+                 << setw(10) << "Salary" << "\n";
+            file << string(70, '-') << "\n";
         }
 
         if (employees.empty()) {
             cout << "No employees found.\n";
-            if (file.is_open()) {
-                file << "No employees found.\n";
-            }
+            if (file.is_open()) file << "No employees found.\n";
         }
 
         for (const auto& emp : employees) {
             emp.show();
             total += emp.salary;
             if (file.is_open()) {
-                file << emp.name << "\t" << emp.id << "\t"
-                     << emp.address << "\t" << emp.salary << "\n";
+                file << left << setw(20) << emp.name
+                     << setw(10) << emp.id
+                     << setw(30) << emp.email
+                     << setw(10) << emp.salary << "\n";
             }
         }
 
-        cout << "\nTotal Salary: " << total << endl;
+        cout << "\nTotal Salary:\t" << total << endl;
         cout << "----- Created by Aman -----\n";
 
         if (file.is_open()) {
-            file << "\nTotal Salary: " << total << "\n";
+            file << "\nTotal Salary:\t" << total << "\n";
             file << "----- Created by Aman -----\n";
             file.close();
             cout << "Report saved to: salary_report.txt\n";
-            cout << "File location: ";
             system("pwd");
         } else {
             cout << "Error saving report to file!\n";
         }
+    }
+
+    void search_employee() {
+        int id;
+        cout << "Enter Employee ID to search: ";
+        if (!(cin >> id)) {
+            cout << "Invalid input.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
+        }
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        for (const auto& emp : employees) {
+            if (emp.id == id) {
+                cout << "\nEmployee Found:\n";
+                cout << left << setw(20) << "Name"
+                     << setw(10) << "ID"
+                     << setw(30) << "Email"
+                     << setw(10) << "Salary" << "\n";
+                cout << string(70, '-') << "\n";
+                emp.show();
+                return;
+            }
+        }
+        cout << "Employee not found!\n";
     }
 
 public:
@@ -162,11 +189,11 @@ public:
         int choice;
         do {
             show_menu();
-            while (!(cin >> choice)) {
-                cout << "Invalid input. Please enter a number.\n";
+            if (!(cin >> choice)) {
+                cout << "Invalid input.\n";
                 cin.clear();
                 cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                show_menu();
+                continue;
             }
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
@@ -175,10 +202,11 @@ public:
                 case 2: remove_employee(); break;
                 case 3: change_employee(); break;
                 case 4: print_report(); break;
-                case 5: cout << "Exiting...\n"; break;
+                case 5: search_employee(); break;
+                case 6: cout << "Exiting...\n"; break;
                 default: cout << "Wrong choice! Try again.\n";
             }
-        } while (choice != 5);
+        } while (choice != 6);
     }
 };
 

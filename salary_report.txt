@@ -1,0 +1,7 @@
+Name                ID        Email                         Salary    
+----------------------------------------------------------------------
+aman kumar          1         amankumr@gmail.com            3.42342e+06
+dfasdfasdf          4         dsfasdfasdfsadfsdfasdfasdfas  34234     
+
+Total Salary:	3.45766e+06
+----- Created by Aman -----
